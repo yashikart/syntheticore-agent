@@ -22,7 +22,7 @@
 ## 📦 Project Structure
 
 ```
-SYNTHETICORE-AGENTAI/
+SYNTHETICORE-AGENT/
 │
 ├── app.py                     # Main Streamlit app UI
 ├── rl_reward_log.csv          # RL reward tracking log
@@ -218,7 +218,7 @@ python multi_domain_inference.py
 ## 📥 Installation
 
 ```bash
-git clone https://github.com/yourusername/syntheticore-agentai.git
+git clone https://github.com/yourusername/syntheticore-agent.git
 cd syntheticore-agentai
 pip install -r requirements.txt
 ```
