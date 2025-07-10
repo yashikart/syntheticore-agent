@@ -1,6 +1,6 @@
 # 🧠 SYNTHETICORE-AGENT
 
-**SynthetiCore Agent ** is a smart, feedback-driven synthetic data generation framework designed to create realistic, bias-aware datasets across key domains such as **Finance**, **Education**, and **Health**. It combines **structured simulation**, **LLM-enhanced text generation**, and **reinforcement learning (RL)** to dynamically improve the quality and realism of generated data based on user feedback.
+** SynthetiCore Agent ** is a smart, feedback-driven synthetic data generation framework designed to create realistic, bias-aware datasets across key domains such as **Finance**, **Education**, and **Health**. It combines **structured simulation**, **LLM-enhanced text generation**, and **reinforcement learning (RL)** to dynamically improve the quality and realism of generated data based on user feedback.
 
 
 
