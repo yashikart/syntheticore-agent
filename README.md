@@ -6,6 +6,9 @@
 
 ---
 
+pip install streamlit pandas numpy Faker openai gym stable-baselines3 altair markdown streamlit-mic-recorder  
+
+
 ## 🌟 Key Features
 
 - 🏛 **Multi-domain simulation** (Finance, Education, Health)
