@@ -6,7 +6,7 @@
 
 ---
 
-pip install streamlit pandas numpy Faker openai gym stable-baselines3 altair markdown streamlit-mic-recorder  
+pip install streamlit pandas numpy Faker openai gym gymnasium stable-baselines3 altair markdown streamlit-mic-recorder  
 
 
 ## 🌟 Key Features
