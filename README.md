@@ -25,6 +25,9 @@ Used libraries:
 
 - `streamlit`
 - `transformers`
+- `openai`
+- `langchain`
+- `spacy`
 - `gymnasium`
 - `stable-baselines3`
 - `faker`
