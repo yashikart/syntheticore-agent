@@ -1,265 +1,179 @@
-# 🧠 SYNTHETICORE-AGENT
 
-** SynthetiCore Agent ** is a smart, feedback-driven synthetic data generation framework designed to create realistic, bias-aware datasets across key domains such as **Finance**, **Education**, and **Health**. It combines **structured simulation**, **LLM-enhanced text generation**, and **reinforcement learning (RL)** to dynamically improve the quality and realism of generated data based on user feedback.
+# 🧠 SyntheticCore Agent UI
 
-
-
----
-
-pip install streamlit pandas numpy Faker openai gym gymnasium stable-baselines3 altair markdown streamlit-mic-recorder  
-
-
-## 🌟 Key Features
-
-- 🏛 **Multi-domain simulation** (Finance, Education, Health)
-- 🔁 **RL-based configuration selection** using reward feedback
-- 🧠 **GPT-powered summaries**, labels, and natural descriptions
-- 🌍 **Language support**: English, Hindi, Hinglish (GPT translation)
-- 🧪 Realism toggle: `Synthetic` vs `Grounded` (LLM-enhanced)
-- 🧰 Export: CSV, JSON
-- 🎙️ Optional: Voice-based prompt input using mic
-- 📈 Reward & feedback logging
+SyntheticCore Agent is an intelligent dataset generation system that allows users to create **customized synthetic or grounded datasets** across multiple domains like **Finance, Education, and Health**. It uses **Faker for synthetic data**, **LLMs for grounded text**, **Transformer models for Hindi & Hinglish translation**, and trains a **Reinforcement Learning (RL) agent using PPO** to improve data generation automatically over time.
 
 ---
 
-## 📦 Project Structure
+## ⚙️ Requirements
 
-```
-SYNTHETICORE-AGENT/
-│
-├── app.py                     # Main Streamlit app UI
-├── rl_reward_log.csv          # RL reward tracking log
-├── feedback_log.csv           # User feedback + sentiment log
-│
-├── data_generators/           # Domain-wise data generators
-│   ├── finance_generator.py
-│   ├── education_generator.py
-│   ├── health_generator.py
-│   └── custom_data_generator.py    # Prompt-based generator
-│
-├── training_rl/               # PPO-based training modules
-│   ├── train_multi_domain.py
-│   ├── multi_domain_env.py
-│   └── multi_domain_inference.py
-│
-├── utils/                     # Supporting logic
-│   ├── rl_agent.py                 # Rule-based RL agent (non-ppo)
-│   ├── reward_functions.py        # Reward logic per domain
-│   ├── llm_generator.py           # GPT-based summary generator
-│   └── hindi_translator.py        # GPT-based row translation
+Make sure you have the following installed:
+
+```bash
+pip install -r requirements.txt
 ```
 
+Environment file (`.env`):
+
+```bash
+OPENAI_API_KEY=your_openai_key_here
+```
+
+Python version: `>=3.8`
+
+Used libraries:
+
+- `streamlit`
+- `transformers`
+- `gymnasium`
+- `stable-baselines3`
+- `faker`
+- `pandas`, `numpy`, `altair`
+
 ---
 
-## 🖥️ UI Features (`app.py`)
+## 🧰 How Dataset Generation Works
 
-- 🎛 Select dataset domain (Finance / Education / Health)
-- 🧠 Toggle realism (Synthetic / GPT-grounded)
-- 🌐 Select output language (English / Hindi / Hinglish)
-- ⚖️ Adjust bias via slider
-- 🔍 Preview data
-- 📥 Export as `.csv` or `.json`
-- 💬 Submit feedback for each dataset
-- 📈 Visualize average reward trend over time
+### 🛠️ 1. Synthetic Dataset (Faker)
+
+We use the **Faker** library to generate realistic synthetic data. Depending on the selected domain, the app creates mock values such as:
+
+- **Finance** → income, expense, occupation, region, etc.  
+- **Education** → progress, subjects, learning style, etc.  
+- **Health** → symptoms, severity, medical history, etc.
+
+Faker ensures that the generated data is **structured and controllable**, but not necessarily based on real-world facts.
+
+---
+
+### 🌍 2. Grounded Dataset (LLMs)
+
+When the user selects **Grounded realism**, we use **OpenAI’s LLM** to generate real-world-like context. For example:
+
+- Health: generates realistic **case summaries**  
+- Finance: generates **financial behavior summaries**  
+- Education: generates **feedback summaries**
+
+These grounded texts are generated via GPT (using `openai.ChatCompletion`) and are closer to human-written descriptions.
+
+---
+
+### 🌐 3. Language Support (English, Hindi, Hinglish)
+
+We support multilingual dataset generation using **Transformer models**:
+
+#### ✅ Hindi:
+- Used **`MarianMTModel`** and **`MarianTokenizer`** from Hugging Face
+- Model: `Helsinki-NLP/opus-mt-en-hi`
+- Example: "Headache, Fever" → "सिरदर्द, बुखार"
+
+#### ✅ Hinglish:
+- Used a **custom mixture** of English + Hindi Transformer output
+- Strategy: Keep structure in English and insert **nouns/adjectives in Hindi**
+- Makes it friendly and relatable for casual use
+
+---
+
+## 🏗️ Customize Your Dataset
+
+The user can customize the dataset by selecting:
+
+- **Domain**: Finance, Health, Education  
+- **Realism**: Synthetic or Grounded  
+- **Language**: English, Hindi, Hinglish  
+- **Bias Level**: 0–100%  
+- **Number of Rows**: 1 to N  
+
+---
+
+## 📈 Reward Function Logic
+
+After generating the dataset, we evaluate it using a **domain-specific reward function**:
+
+```python
+Reward = Realism + Balance + Variability
+```
+
+- **Realism** → Are the values meaningful and contextually correct?  
+- **Balance** → Does the data contain a good mix (e.g., gender, region, etc.)?  
+- **Variability** → How diverse is the dataset?
+
+The total average reward is shown in the UI with 💡, and logged into `rl_reward_log.csv`.
+
+---
+
+## 💬 User Feedback Loop
+
+After each dataset is generated:
+
+- Bot asks user to rate (1–5) and leave feedback  
+- Comment + Rating is saved in `feedback_log.csv`  
+- Sentiment is optionally analyzed using LLM
 
 ---
 
 ## 🤖 Reinforcement Learning Logic
 
-The **RL Agent** uses one of four preset configurations:
+To **automatically improve** the dataset generation:
 
-```python
-configs = [
-    {"realism": "Synthetic", "bias": 0},
-    {"realism": "Synthetic", "bias": 20},
-    {"realism": "Grounded", "bias": 10},
-    {"realism": "Grounded", "bias": 30}
-]
-```
+### 🧪 Custom Gym Environment
 
-Each time a dataset is generated:
+We created `MultiDomainDataEnv` with:
 
-- The agent selects the configuration with the **highest cumulative reward**.
-- Reward is computed using:
+- Action Space → All combinations of (Domain, Realism, Bias)
+- Observation → Dummy value
+- Reward → Computed based on the dataset quality
 
-```python
-reward = realism_score + balance_score + variability_score
-```
+### 🔁 PPO Training
 
-### 🧾 Example – Finance Reward Breakdown
+We used `Proximal Policy Optimization (PPO)` from Stable Baselines3 to train the RL agent.
 
-- **Realism**: `Income > Expense`
-- **Balance**: `Label ∈ {"Good Saver", "Over-Spender"}`
-- **Variability**: Diversity in `Occupation`, `Region`, and `Behavior`
+Training steps:
 
-Similar reward logic is applied for **Education** and **Health** domains.  
-User feedback is analyzed using **GPT-3.5**, which extracts:
+1. Agent selects an action → e.g., “Education, Grounded, Bias=30%”
+2. A dataset is generated using that config
+3. Reward is computed
+4. PPO updates its policy to favor better configs
 
-- A **rating** (1–5)
-- **Sentiment**: Positive / Negative
-
-These are used to update the RL agent’s reward values dynamically.
+Training script: `train_multi_domain.py`  
+Saved model: `ppo_multi_agent.zip`
 
 ---
 
-## 🧪 Domain Modules
+### ⚡ Inference Using Trained Agent
 
-Each domain has a dedicated generator function:
+Once trained:
 
-### 🏦 Finance
-
-```python
-generate_finance_data(realism="Grounded", bias=30)
-```
-
-- **Fields**: Income, Expense, Goals, Occupation, Label  
-- **Summary**: GPT-generated financial profile
+- Load the model via `multi_domain_inference.py`
+- The agent will recommend the best config
+- Dataset will be generated automatically
+- User feedback continues to be logged to improve the agent
 
 ---
 
-### 🎓 Education
+## 📋 Chatbot Prompt Example
 
-```python
-generate_education_data(realism="Grounded", bias=20)
-```
+```plaintext
+User: What is the difference between synthetic and grounded datasets?
 
-- **Fields**: Strengths, Weaknesses, Progress  
-- **Summary**: GPT-generated feedback & learning strategy
+Bot: Synthetic datasets use Faker to generate mock data. Grounded datasets are created using real-world-like summaries powered by LLMs.
 
----
+User: I want 3 rows with health data, grounded, in Hindi, bias 50.
 
-### 🏥 Health
-
-```python
-generate_health_data(realism="Grounded", bias=10)
-```
-
-- **Fields**: Diagnosis, Symptoms, Severity  
-- **Summary**: GPT-generated medical case report
-
-> ✅ All domain datasets can be optionally **translated to Hindi or Hinglish** using GPT-powered translation.
-
----
-
-## ✨ LLM Usage
-
-- 📝 **Summarization**: GPT generates summaries per row or profile
-- 🌐 **Translation**: Converts English rows to Hindi/Hinglish
-- 📊 **Rating Extraction**: GPT interprets natural feedback to extract numeric scores and sentiment
-- 🧾 **Custom Prompt-to-Columns**: Schema inferred from user prompts
-
----
-
-## 🧠 PPO Agent (Optional)
-
-To enable policy optimization using `stable-baselines3`:
-
-### 🏋️ Train Agent
-
-```bash
-cd training_rl
-python train_multi_domain.py
-```
-
-### 🧠 Run Inference
-
-```bash
-python multi_domain_inference.py
-```
-
-> Trained model is saved as `ppo_multi_agent.zip`
-
----
-
-## 📤 Output Examples
-
-- Download formats: `.csv`, `.json`
-- Varying columns depending on domain
-- Each row includes timestamp, label, summary, and optional translations
-
----
-
-## 📊 Reward Tracking
-
-- Logged to `rl_reward_log.csv`
-- Fields: `timestamp`, `domain`, `file_name`, `avg_reward`, `record_count`
-- Visualized using Altair chart in UI
-
----
-
-## 💬 Feedback Logging
-
-- Logged to `feedback_log.csv`
-- Fields: `timestamp`, `domain`, `file_name`, `user_comment`, `GPT_rating`, `sentiment`
-
----
-
-## 🧑‍🎓 Persona-Driven Simulation
-
-- **📘 Students**: progress, learning style, goal, feedback
-- **🏥 Patients**: symptoms, diagnosis, severity, lifestyle
-- **💰 Finance Users**: savings goal, spending pattern, occupation
-
----
-
-## ✅ Deliverables Recap
-
-| Deliverable                          | Status |
-| ----------------------------------- | ------ |
-| UI with toggles and filters         | ✅     |
-| Multi-domain data generators        | ✅     |
-| RL reward logic                     | ✅     |
-| PPO agent (optional)                | ✅     |
-| Feedback + sentiment loop           | ✅     |
-| Export (CSV/JSON)                   | ✅     |
-| LLM integration (text + translation)| ✅     |
-| RL reward visualizations            | ✅     |
-| Voice prompt via mic_recorder       | ✅     |
-
----
-
-## 📥 Installation
-
-```bash
-git clone https://github.com/yourusername/syntheticore-agent.git
-cd syntheticore-agentai
-pip install -r requirements.txt
-```
-
-Set your OpenAI API Key:
-
-```bash
-export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
-```
-
-Launch the app:
-
-```bash
-streamlit run app.py
+Bot: [Generated dataset]
+Bot: Please rate this dataset (1-5) and leave a comment.
 ```
 
 ---
 
-## 📚 Learning Goals Covered
+## 📊 Logs & Visualization
 
-- Prompt engineering
-- Data realism & bias simulation
-- RL in data pipelines
-- GPT integration in structured workflows
-- Feedback loop using LLM
-- Persona-driven simulation
+- `rl_reward_log.csv` → Tracks rewards over time  
+- `feedback_log.csv` → Stores comments + ratings  
+- 📈 Altair charts used for reward trends per domain in the UI
 
 ---
 
-## 👩‍💻 Author
+## 📎 Summary
 
-**Yashika Tirkey**  
-🎓 Passionate about AI Agents, Data Simulation & Applied LLMs
-
----
-
-## 🏁 Final Notes
-
-- ✅ Modular architecture for plug-and-play domains
-- 🚀 Easy to extend: Add `mental_health_generator.py`, `ecommerce_generator.py`, etc.
-- 💬 Optional: Enable Whisper or browser mic for prompt-to-data generation
+SyntheticCore Agent intelligently generates data, collects feedback, and learns from it using reinforcement learning. It's ideal for simulating domain-specific datasets, analyzing user preferences, and improving generation quality with every interaction.
