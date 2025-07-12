@@ -1,7 +1,7 @@
 
-# 🧠 SyntheticCore Agent UI
+# 🧠 SynthetiCore Agent 
 
-SyntheticCore Agent is an intelligent dataset generation system that allows users to create **customized synthetic or grounded datasets** across multiple domains like **Finance, Education, and Health**. It uses **Faker for synthetic data**, **LLMs for grounded text**, **Transformer models for Hindi & Hinglish translation**, and trains a **Reinforcement Learning (RL) agent using PPO** to improve data generation automatically over time.
+SynthetiCore Agent is an intelligent dataset generation system that allows users to create **customized synthetic or grounded datasets** across multiple domains like **Finance, Education, and Health**. It uses **Faker for synthetic data**, **LLMs for grounded text**, **Transformer models for Hindi & Hinglish translation**, and trains a **Reinforcement Learning (RL) agent using PPO** to improve data generation automatically over time.
 
 ---
 
